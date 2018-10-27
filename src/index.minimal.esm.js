@@ -1,6 +1,6 @@
 import VeeValidate from './plugin';
 import Validator from './core/validator';
-import { ValidationProvider, ValidationObserver } from './components';
+import { ValidationProvider, ValidationObserver, withValidation } from './components';
 
 const version = '__VERSION__';
 const install = VeeValidate.install;
@@ -12,7 +12,8 @@ export {
   Validator,
   version,
   ValidationProvider,
-  ValidationObserver
+  ValidationObserver,
+  withValidation
 };
 
 export default VeeValidate;

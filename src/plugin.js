@@ -1,7 +1,7 @@
 import dictionary from './dictionary';
 import { assign, getPath, warn, isCallable } from './utils';
 import Validator from './core/validator';
-import { ValidationProvider, ValidationObserver } from './components';
+import { ValidationProvider, ValidationObserver, withValidation } from './components';
 import I18nDictionary from './localization/i18n';
 
 // @flow
@@ -29,9 +29,12 @@ export let currentConfig = assign({}, defaultConfig);
 export let pluginInstance;
 
 class VeeValidate {
-  static version: string
-  static install: () => void
-  static Validator: Function<Validator>
+  static version: string;
+  static install: () => void;
+  static Validator: Function<Validator>;
+  static ValidationProvider: any;
+  static ValidationObserver: any;
+  static withValidation: (component: any) => any;
 
   _vm: any
   _validator: Validator
@@ -158,5 +161,6 @@ VeeValidate.version = '__VERSION__';
 VeeValidate.Validator = Validator;
 VeeValidate.ValidationProvider = ValidationProvider;
 VeeValidate.ValidationObserver = ValidationObserver;
+VeeValidate.withValidation = withValidation;
 
 export default VeeValidate;

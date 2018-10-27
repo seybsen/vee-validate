@@ -3,7 +3,7 @@ import en from '../locale/en';
 import * as Rules from './rules';
 import Validator from './core/validator';
 import { assign } from './utils';
-import { ValidationProvider, ValidationObserver } from './components';
+import { ValidationProvider, ValidationObserver, withValidation } from './components';
 
 const version = '__VERSION__';
 
@@ -22,7 +22,8 @@ export {
   Rules,
   version,
   ValidationProvider,
-  ValidationObserver
+  ValidationObserver,
+  withValidation
 };
 
 export default VeeValidate;
