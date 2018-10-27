@@ -1,11 +1,7 @@
 import VeeValidate from './plugin';
-import directive from './directive';
-import mixin from './mixin';
 import en from '../locale/en';
 import * as Rules from './rules';
-import mapFields from './core/mapFields';
 import Validator from './core/validator';
-import ErrorBag from './core/errorBag';
 import { assign } from './utils';
 import { ValidationProvider, ValidationObserver } from './components';
 
@@ -25,11 +21,7 @@ VeeValidate.use(rulesPlugin);
 
 export {
   install,
-  directive,
-  mixin,
-  mapFields,
   Validator,
-  ErrorBag,
   Rules,
   version,
   ValidationProvider,

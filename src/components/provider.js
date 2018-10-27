@@ -204,7 +204,7 @@ export const ValidationProvider = {
     validate () {
       this.setFlags({ pending: true });
 
-      return $validator.verify(this.value, this.rules, {
+      return $validator.validate(this.value, this.rules, {
         name: this.name,
         values: createValuesLookup(this)
       }).then(result => {

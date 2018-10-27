@@ -25,10 +25,6 @@ export default class RuleContainer {
     return !!(RULES[name] && RULES[name].options.hasTarget);
   }
 
-  static remove (ruleName) {
-    delete RULES[ruleName];
-  }
-
   static getParamNames (ruleName) {
     return RULES[ruleName] && RULES[ruleName].paramNames;
   }

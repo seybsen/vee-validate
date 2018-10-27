@@ -1,13 +1,8 @@
 import dictionary from './dictionary';
-import mixin from './mixin';
-import directive from './directive';
 import { assign, getPath, warn, isCallable } from './utils';
 import Validator from './core/validator';
-import ErrorBag from './core/errorBag';
-import mapFields from './core/mapFields';
 import { ValidationProvider, ValidationObserver } from './components';
 import I18nDictionary from './localization/i18n';
-import { detectPassiveSupport } from './utils/events';
 
 // @flow
 
@@ -74,7 +69,7 @@ class VeeValidate {
       return;
     }
 
-    plugin({ Validator, ErrorBag, Rules: Validator.rules }, options);
+    plugin({ Validator }, options);
   };
 
   static install (_Vue, opts) {
@@ -88,10 +83,6 @@ class VeeValidate {
     Vue = _Vue;
     pluginInstance = new VeeValidate(opts);
 
-    detectPassiveSupport();
-
-    Vue.mixin(mixin);
-    Vue.directive('validate', directive);
     if (pendingPlugins) {
       pendingPlugins.forEach(({ plugin, options }) => {
         VeeValidate.use(plugin, options);
@@ -164,11 +155,7 @@ class VeeValidate {
 }
 
 VeeValidate.version = '__VERSION__';
-VeeValidate.mixin = mixin;
-VeeValidate.directive = directive;
 VeeValidate.Validator = Validator;
-VeeValidate.ErrorBag = ErrorBag;
-VeeValidate.mapFields = mapFields;
 VeeValidate.ValidationProvider = ValidationProvider;
 VeeValidate.ValidationObserver = ValidationObserver;
 
