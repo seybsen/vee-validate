@@ -60,22 +60,6 @@ export const getPath = (path: string, target: ?Object, def: any = undefined) => 
 };
 
 /**
- * Checks if path exists within an object.
- */
-export const hasPath = (path: string, target: Object) => {
-  let obj = target;
-  return path.split('.').every(prop => {
-    if (prop in obj) {
-      obj = obj[prop];
-
-      return true;
-    }
-
-    return false;
-  });
-};
-
-/**
  * Parses a rule string expression.
  */
 export const parseRule = (rule: string): Object => {
@@ -193,7 +177,9 @@ export const toArray = (arrayLike: { length: number }) => {
     return Array.from(arrayLike);
   }
 
+  /* istanbul ignore next */
   const array = [];
+  /* istanbul ignore next */
   const length = arrayLike.length;
   /* istanbul ignore next */
   for (let i = 0; i < length; i++) {
