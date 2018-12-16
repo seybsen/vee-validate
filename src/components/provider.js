@@ -106,13 +106,11 @@ function createValuesLookup (ctx) {
   let providers = ctx.$_veeObserver.refs;
 
   return ctx.fieldDeps.reduce((acc, depName) => {
-    if (providers[depName]) {
-      acc[depName] = providers[depName].value;
-      const unwatch = providers[depName].$watch('value', () => {
-        ctx.validate(ctx.value).then(ctx.applyResult);
-        unwatch();
-      });
+    if (!providers[depName]) {
+      return acc;
     }
+
+    acc[depName] = providers[depName].value;
 
     return acc;
   }, {});
@@ -275,9 +273,18 @@ export const ValidationProvider = {
     },
     fieldDeps () {
       const rules = normalizeRules(this.rules);
+      let providers = this.$_veeObserver.refs;
 
       return Object.keys(rules).filter(RuleContainer.isTargetRule).map(rule => {
-        return rules[rule][0];
+        const depName = rules[rule][0];
+        const watcherName = `$__${depName}`;
+        if (!isCallable(this[watcherName])) {
+          this[watcherName] = providers[depName].$watch('value', () => {
+            this.validate().then(this.applyResult);
+          });
+        }
+
+        return depName;
       });
     },
     normalizedEvents () {
