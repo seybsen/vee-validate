@@ -1,4 +1,4 @@
-import { assign, includes } from '../utils';
+import { assign, includes, matchesPattern } from '../utils';
 
 // @flow
 
@@ -39,22 +39,14 @@ const combine = (lhs: MapObject, rhs: MapObject): boolean => {
   }, {});
 };
 
-const mapScope = (scope: MapObject, deep: boolean = true): MapObject => {
-  return Object.keys(scope).reduce((flags, field) => {
+const mapLevel = (level: MapObject, deep: boolean = true): MapObject => {
+  return Object.keys(level).reduce((flags, field) => {
     if (!flags) {
-      flags = assign({}, scope[field]);
+      flags = assign({}, level[field]);
       return flags;
     }
 
-    // scope.
-    const isScope = field.indexOf('$') === 0;
-    if (deep && isScope) {
-      return combine(mapScope(scope[field]), flags);
-    } else if (!deep && isScope) {
-      return flags;
-    }
-
-    flags = combine(flags, scope[field]);
+    flags = combine(flags, level[field]);
 
     return flags;
   }, null);
@@ -66,7 +58,7 @@ const mapScope = (scope: MapObject, deep: boolean = true): MapObject => {
 const mapFields = (fields?: Array<any> | Object): Object | Function => {
   if (!fields) {
     return function () {
-      return mapScope(this.$validator.flags);
+      return mapLevel(this.$validator.flags);
     };
   }
 
@@ -81,7 +73,7 @@ const mapFields = (fields?: Array<any> | Object): Object | Function => {
 
       // scopeless fields were selected.
       if (normalized[curr] === '*') {
-        return mapScope(this.$validator.flags, false);
+        return mapLevel(this.$validator.flags, false);
       }
 
       // if it has a scope defined
@@ -97,7 +89,7 @@ const mapFields = (fields?: Array<any> | Object): Object | Function => {
 
       // an entire scope was selected: scope.*
       if (name === '*' && scope) {
-        return mapScope(scope);
+        return mapLevel(scope);
       }
 
       if (scope && scope[name]) {

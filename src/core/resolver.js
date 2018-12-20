@@ -1,7 +1,6 @@
 import { pluginInstance as VeeValidate } from '../plugin';
 import { findModel } from '../utils/vnode';
 import {
-  getScope,
   getDataAttribute,
   isObject,
   toArray,
@@ -30,7 +29,6 @@ export default class Resolver {
       el: el,
       listen: !binding.modifiers.disable,
       bails: binding.modifiers.bails ? true : (binding.modifiers.continues === true ? false : undefined),
-      scope: Resolver.resolveScope(el, binding, vnode),
       vm: Resolver.makeVM(vnode.context),
       expression: binding.value,
       component: vnode.componentInstance,
@@ -175,20 +173,6 @@ export default class Resolver {
     }
 
     return events;
-  }
-
-  /**
-   * Resolves the scope for the field.
-   * @param {*} el
-   * @param {*} binding
-   */
-  static resolveScope (el, binding, vnode = {}) {
-    let scope = null;
-    if (vnode.componentInstance && isNullOrUndefined(scope)) {
-      scope = vnode.componentInstance.$attrs && vnode.componentInstance.$attrs['data-vv-scope'];
-    }
-
-    return !isNullOrUndefined(scope) ? scope : getScope(el);
   }
 
   /**
