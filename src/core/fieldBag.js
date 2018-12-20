@@ -28,7 +28,7 @@ export default class FieldBag {
   }
 
   /**
-   * Finds the first field that matches the provided matcher object.
+   * Finds the first field that matches the pronameed matcher object.
    */
   find (matcher: Object): ?Field {
     return find(this.items, item => item.matches(matcher));
@@ -54,7 +54,7 @@ export default class FieldBag {
   }
 
   /**
-   * Finds and removes the first field that matches the provided matcher object, returns the removed item.
+   * Finds and removes the first field that matches the pronameed matcher object, returns the removed item.
    */
   remove (matcher: Object | Field): Field | null {
     let item = null;

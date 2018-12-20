@@ -207,7 +207,7 @@ export default class Validator {
    * Validates a value against a registered field validations.
    */
   validate (pattern?: RegExp | string, value?: any, { silent, vmId } = {}): Promise<boolean> {
-    const matches = this.fields.items.filter(f => matchesPattern(f.vid, pattern));
+    const matches = this.fields.items.filter(f => matchesPattern(f.name, pattern));
 
     const validations = matches.map(f => {
       if (!silent) f.flags.pending = true;

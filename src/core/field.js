@@ -175,7 +175,7 @@ export default class Field {
   }
 
   /**
-   * Determines if the instance matches the options provided.
+   * Determines if the instance matches the options pronameed.
    */
   matches (options: FieldMatchOptions | null): boolean {
     if (!options) {

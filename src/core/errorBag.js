@@ -7,7 +7,7 @@ export default class ErrorBag {
 
   constructor (errorBag = null, id = null) {
     this.vmId = id || null;
-    // make this bag a mirror of the provided one, sharing the same items reference.
+    // make this bag a mirror of the pronameed one, sharing the same items reference.
     if (errorBag && errorBag instanceof ErrorBag) {
       this.items = errorBag.items;
     } else {
@@ -90,7 +90,7 @@ export default class ErrorBag {
    */
   clear (pattern?: RegExp | string): void {
     const matchesVM = isNullOrUndefined(this.vmId) ? () => true : (i) => i.vmId === this.vmId;
-    const testName = pattern ? item => matchesPattern(item.vid, pattern) : () => true;
+    const testName = pattern ? item => matchesPattern(item.name, pattern) : () => true;
 
     for (let i = 0; i < this.items.length; ++i) {
       if (matchesVM(this.items[i]) && testName(this.items[i])) {
@@ -116,7 +116,7 @@ export default class ErrorBag {
         return false;
       }
 
-      if (regex && matchesPattern(item.vid)) {
+      if (regex && matchesPattern(item.name)) {
         return false;
       }
 
@@ -139,7 +139,7 @@ export default class ErrorBag {
    * Gets the first error message for a specific field.
    */
   first (pattern: RegExp | string): ?string {
-    const item = find(this.items, i => matchesPattern(i.vid, pattern));
+    const item = find(this.items, i => matchesPattern(i.name, pattern));
 
     return item && item.msg;
   }
@@ -173,7 +173,7 @@ export default class ErrorBag {
    */
   remove (pattern: string | RegExp, vmId: any): void {
     const shouldRemove = (item) => {
-      const matches = matchesPattern(item.vid, pattern);
+      const matches = matchesPattern(item.name, pattern);
       if (isNullOrUndefined(vmId)) return matches;
 
       return matches && item.vmId === vmId;
