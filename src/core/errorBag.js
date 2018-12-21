@@ -4,6 +4,7 @@ import { find, isNullOrUndefined, isCallable, matchesPattern } from '../utils';
 
 export default class ErrorBag {
   items: FieldError[];
+  vmId: any;
 
   constructor (errorBag = null, id = null) {
     this.vmId = id || null;
@@ -60,7 +61,7 @@ export default class ErrorBag {
   }
 
   /**
-   * Gets all error messages from the internal array.
+   * Gets all error messages from the internal array or matching fields messages.
    */
   all (pattern?: RegExp | string): string[] {
     const filterFn = (item) => {
@@ -68,7 +69,7 @@ export default class ErrorBag {
         return false;
       }
 
-      if (pattern && !matchesPattern(item.id, pattern)) {
+      if (pattern && !matchesPattern(item.field, pattern)) {
         return false;
       }
 
@@ -76,6 +77,21 @@ export default class ErrorBag {
     };
 
     return this.items.filter(filterFn).map(e => e.msg);
+  }
+
+  /**
+   * Returns field errors keyed by rule name, does not match patters, only exact matches.
+   */
+  rules (field: string): { [x: string]: string } {
+    const messageObjects = this.items.filter(i => matchesPattern(i.field, field));
+
+    return messageObjects.reduce((acc, curr) => {
+      if (curr.rule) {
+        acc[curr.rule] = curr.msg;
+      }
+
+      return acc;
+    }, {});
   }
 
   /**
@@ -88,12 +104,11 @@ export default class ErrorBag {
   /**
    * Removes all items from the internal array.
    */
-  clear (pattern?: RegExp | string): void {
+  clear (): void {
     const matchesVM = isNullOrUndefined(this.vmId) ? () => true : (i) => i.vmId === this.vmId;
-    const testName = pattern ? item => matchesPattern(item.name, pattern) : () => true;
 
     for (let i = 0; i < this.items.length; ++i) {
-      if (matchesVM(this.items[i]) && testName(this.items[i])) {
+      if (matchesVM(this.items[i])) {
         this.items.splice(i, 1);
         --i;
       }
@@ -101,10 +116,40 @@ export default class ErrorBag {
   }
 
   /**
-   * Collects errors into groups or for a specific field.
+   * Groups errors by field name.
    */
-  collect (field?: string, map?: boolean = true) {
-    // FIXME: Implement collect
+  group (): { [fieldName: string]: string[] } {
+    return this.items.reduce((acc, curr) => {
+      if (!isNullOrUndefined(this.vmId) && curr.vmId !== this.vmId) {
+        return acc;
+      }
+
+      return this._addInGroup(curr, acc);
+    }, {});
+  }
+
+  /**
+   * Group errors by field names that match a pattern.
+   */
+  groupBy (pattern: RegExp): { [fieldName: string]: string[] } {
+    const matchesVM = isNullOrUndefined(this.vmId) ? () => true : item => item.vmId === this.vmId;
+    return this.items.reduce((acc, curr) => {
+      if (!matchesVM(curr) || !matchesPattern(curr.field, pattern)) {
+        return acc;
+      }
+
+      return this._addInGroup(curr, acc);
+    }, {});
+  }
+
+  _addInGroup (error: FieldError, group: { [x: string]: string[] }) {
+    if (!group[error.field]) {
+      group[error.field] = [];
+    }
+
+    group[error.field].push(error.msg);
+
+    return group;
   }
 
   /**
@@ -116,7 +161,7 @@ export default class ErrorBag {
         return false;
       }
 
-      if (regex && matchesPattern(item.name)) {
+      if (regex && matchesPattern(item.field, regex)) {
         return false;
       }
 
@@ -129,7 +174,7 @@ export default class ErrorBag {
   /**
    * Finds and fetches the first error message for the specified field id.
    */
-  firstById (id: string): string | null {
+  firstById (id: string): ?string {
     const error = find(this.items, i => i.id === id);
 
     return error ? error.msg : undefined;
@@ -139,7 +184,7 @@ export default class ErrorBag {
    * Gets the first error message for a specific field.
    */
   first (pattern: RegExp | string): ?string {
-    const item = find(this.items, i => matchesPattern(i.name, pattern));
+    const item = find(this.items, i => matchesPattern(i.field, pattern));
 
     return item && item.msg;
   }
@@ -169,11 +214,11 @@ export default class ErrorBag {
   }
 
   /**
-   * Removes all error messages associated with a specific field.
+   * Removes all error messages which its field name matches the pattern.
    */
   remove (pattern: string | RegExp, vmId: any): void {
     const shouldRemove = (item) => {
-      const matches = matchesPattern(item.name, pattern);
+      const matches = matchesPattern(item.field, pattern);
       if (isNullOrUndefined(vmId)) return matches;
 
       return matches && item.vmId === vmId;
