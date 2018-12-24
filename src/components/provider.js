@@ -13,11 +13,7 @@ export function createValidationCtx (ctx) {
     classes: ctx.classes,
     valid: ctx.isValid,
     reset: () => ctx.reset(),
-    validate: (e) => {
-      ctx.syncValue(e);
-
-      return ctx.validate().then(ctx.applyResult);
-    },
+    validate: (...args) => ctx.validate(...args),
     aria: {
       'aria-invalid': ctx.flags.invalid ? 'true' : 'false',
       'aria-required': ctx.isRequired ? 'true' : 'false'
@@ -46,7 +42,7 @@ export function onRenderUpdate (model) {
     };
 
     this.value = model.value;
-    this.validate().then(this.immediate || shouldRevalidate ? this.applyResult : silentHandler);
+    this.validateSilent().then(this.immediate || shouldRevalidate ? this.applyResult : silentHandler);
   }
 
   this._needsValidation = false;
@@ -230,7 +226,18 @@ export const ValidationProvider = {
       flags.changed = false;
       this.setFlags(flags);
     },
-    validate () {
+    validate (...args) {
+      if (args[0]) {
+        this.syncValue(args[0]);
+      }
+
+      return this.validateSilent().then(result => {
+        this.applyResult(result);
+
+        return result;
+      });
+    },
+    validateSilent () {
       this.setFlags({ pending: true });
 
       return $validator.validate(this.value, this.rules, {
@@ -280,7 +287,7 @@ export const ValidationProvider = {
         const watcherName = `$__${depName}`;
         if (!isCallable(this[watcherName])) {
           this[watcherName] = providers[depName].$watch('value', () => {
-            this.validate().then(this.applyResult);
+            this.validate();
           });
         }
 
