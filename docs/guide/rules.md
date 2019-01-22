@@ -599,5 +599,5 @@ This rule can recieve any args from [validator.js isURL](https://github.com/chri
 <span v-show="errors.has('url_field')" class="help is-danger">{{ errors.first('url_field') }}</span>
 
 ```html
-<input v-validate="'url:require_protocol'" data-vv-as="field" name="url_field" type="text">
+<input v-validate="'url:require_valid_protocol'" data-vv-as="field" name="url_field" type="text">
 ```
